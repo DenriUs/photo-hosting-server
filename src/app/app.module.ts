@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import AuthModule from 'src/auth/auth.module';
 import UserModule from 'src/user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/photo-hosting'),
+    ConfigModule.forRoot({ envFilePath: '.env' }),
+    MongooseModule.forRoot(process.env.DB_CONNECTION_STRING),
     AuthModule,
     UserModule,
   ],
