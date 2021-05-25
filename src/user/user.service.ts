@@ -12,7 +12,7 @@ export default class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(createUserDto);
     while (true) {
       createdUser._id = uuidV4();
@@ -21,15 +21,15 @@ export default class UserService {
     return createdUser.save();
   }
 
-  getAll(): Promise<User[]> {
+  getAll(): Promise<UserDocument[]> {
     return this.userModel.find().exec();
   }
 
-  getById(id: string): Promise<User> {
+  getById(id: string): Promise<UserDocument> {
     return this.userModel.findOne({ id }).exec();
   }
 
-  getByLogin(login: string): Promise<User> {
+  getByLogin(login: string): Promise<UserDocument> {
     return this.userModel.findOne({ login }).exec();
   }
 

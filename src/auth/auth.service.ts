@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcrypt';
-import { User } from '../user/schemas/user.schema';
+import { UserDocument } from '../user/schemas/user.schema';
 import UserService from '../user/user.service';
 import CreateUserDto from '../user/dto/create-user.dto';
 
@@ -14,9 +14,8 @@ export default class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  login(user: User): Promise<string> {
+  login(user: UserDocument): Promise<string> {
     const payload = {
-      id: user._id,
       login: user.login,
       password: user.password,
     }

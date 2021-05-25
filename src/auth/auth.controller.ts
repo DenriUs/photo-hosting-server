@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
 import AuthService from './auth.service';
 import UserService from '../user/user.service';
 import CreateUserDto from '../user/dto/create-user.dto';
 import AuthorizeUserDto from '../user/dto/authorize-user.dto';
+import { ForAuthorized } from './auth.decorators';
 
 @Controller('auth')
 export default class AuthController {
@@ -27,6 +28,12 @@ export default class AuthController {
   async register(@Body() user: CreateUserDto): Promise<void> {
     await this.verifyRegistrationData(user);
     await this.authService.register(user);
+  }
+
+  @ForAuthorized()
+  @Get('checkAuthStatus')
+  checkAuthStatus() {
+    return;
   }
 
   private async verifyRegistrationData(createUserDto: CreateUserDto) {
