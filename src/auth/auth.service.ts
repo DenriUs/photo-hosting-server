@@ -14,7 +14,7 @@ export default class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  login(user: UserDocument): Promise<string> {
+  public login(user: UserDocument): Promise<string> {
     const payload = {
       login: user.login,
       password: user.password,
@@ -22,7 +22,7 @@ export default class AuthService {
     return this.jwtService.signAsync(payload);
   }
 
-  async register(createUserDto: CreateUserDto): Promise<void> {
+  public async register(createUserDto: CreateUserDto): Promise<void> {
     createUserDto.password = await hash(createUserDto.password, this.hashRounds);
     await this.userService.create(createUserDto);
   }

@@ -13,7 +13,7 @@ export default class AuthController {
   ) {}
 
   @Post('login')
-  async login(@Body() authorizeUserDto: AuthorizeUserDto): Promise<{ accessToken: string }> {
+  public async login(@Body() authorizeUserDto: AuthorizeUserDto): Promise<{ accessToken: string }> {
     if (!authorizeUserDto.login || !authorizeUserDto.password) {
       throw new BadRequestException();
     }
@@ -25,23 +25,23 @@ export default class AuthController {
   }
 
   @Post('register')
-  async register(@Body() user: CreateUserDto): Promise<void> {
+  public async register(@Body() user: CreateUserDto): Promise<void> {
     await this.verifyRegistrationData(user);
     await this.authService.register(user);
   }
 
   @ForAuthorized()
   @Get('checkAuthStatus')
-  checkAuthStatus() {
+  public checkAuthStatus() {
     return;
   }
 
   private async verifyRegistrationData(createUserDto: CreateUserDto) {
-    if (!await this.userService.isLoginUnique(createUserDto.login)) {
-      throw new BadRequestException(`Логін: ${createUserDto.login} вже зайнятий`);
+    if (!await this.userService.checkIsLoginUnique(createUserDto.login)) {
+      throw new BadRequestException(`Логін ${createUserDto.login} вже зайнятий`);
     }
-    if (!await this.userService.isEmailUnique(createUserDto.email)) {
-      throw new BadRequestException(`Email: ${createUserDto.email} вже зайнятий`);
+    if (!await this.userService.checkIsEmailUnique(createUserDto.email)) {
+      throw new BadRequestException(`Email ${createUserDto.email} вже зайнятий`);
     }
   }
 }

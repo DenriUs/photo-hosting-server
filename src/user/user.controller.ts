@@ -1,9 +1,18 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import UserService from './user.service';
-import { ForAuthorized } from '../auth/auth.decorators';
+import { ForAuthorized, GetUser } from '../auth/auth.decorators';
+import { UserDocument } from './schemas/user.schema';
 
 @ForAuthorized()
 @Controller('user')
 export default class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('getCurrentUserData')
+  public async getCurrentUserData(
+    @GetUser() currentUser: UserDocument,
+  ): Promise<Partial<UserDocument>> {
+    const { id, login, email } = currentUser;
+    return { id, login, email };
+  }
 }

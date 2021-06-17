@@ -12,7 +12,7 @@ export default class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+  public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(createUserDto);
     while (true) {
       createdUser._id = uuidV4();
@@ -21,27 +21,27 @@ export default class UserService {
     return createdUser.save();
   }
 
-  getAll(): Promise<UserDocument[]> {
+  public getAll(): Promise<UserDocument[]> {
     return this.userModel.find().exec();
   }
 
-  getById(id: string): Promise<UserDocument> {
-    return this.userModel.findOne({ id }).exec();
+  public getById(id: string): Promise<UserDocument> {
+    return this.userModel.findOne({ _id: id }).exec();
   }
 
-  getByLogin(login: string): Promise<UserDocument> {
+  public getByLogin(login: string): Promise<UserDocument> {
     return this.userModel.findOne({ login }).exec();
   }
 
-  checkPassword(incomingPassword: string, currentPassword: string): Promise<boolean> {
+  public checkPassword(incomingPassword: string, currentPassword: string): Promise<boolean> {
     return compare(incomingPassword, currentPassword);
   }
 
-  async isLoginUnique(login: string): Promise<boolean> {
+  public async checkIsLoginUnique(login: string): Promise<boolean> {
     return !await this.userModel.findOne({ login });
   }
 
-  async isEmailUnique(email: string): Promise<boolean> {
+  public async checkIsEmailUnique(email: string): Promise<boolean> {
     return !await this.userModel.findOne({ email });
   }
 }
