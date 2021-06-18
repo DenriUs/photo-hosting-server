@@ -12,47 +12,58 @@ export default class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  public async getUniqueUuidByParameter(parameter: 'userId' | 'azureStorageName') {
+  public async getUniqueUuidByParameter(
+    parameter: 'userId' | 'azureStorageName',
+  ) {
     let uuid = '';
     while (true) {
       uuid = uuidV4();
-      const getAction = parameter === 'userId' ? this.getById : this.getByAzureStorageContainerName;
-      if (!await getAction(uuid)) break;
+      if (
+        !(await (parameter === 'userId'
+          ? this.getById(uuid)
+          : this.getByAzureStorageContainerName(uuid)))
+      )
+        break;
     }
     return uuid;
   }
 
   public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const createdUser = new this.userModel(createUserDto);
-    createdUser._id = await this.getUniqueUuidByParameter('userId');
-    return createdUser.save();
+    const newUser = new this.userModel(createUserDto);
+    newUser._id = await this.getUniqueUuidByParameter('userId');
+    return newUser.save();
   }
 
   public getAll(): Promise<UserDocument[]> {
     return this.userModel.find().exec();
   }
 
-  public getById(id: string): Promise<UserDocument> {
+  public getById(id: string): Promise<UserDocument | undefined> {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
-  public getByAzureStorageContainerName(name: string): Promise<UserDocument> {
+  public getByAzureStorageContainerName(
+    name: string,
+  ): Promise<UserDocument | undefined> {
     return this.userModel.findOne({ azureStorageContainerName: name }).exec();
   }
 
-  public getByLogin(login: string): Promise<UserDocument> {
+  public getByLogin(login: string): Promise<UserDocument | undefined> {
     return this.userModel.findOne({ login }).exec();
   }
 
-  public checkPassword(incomingPassword: string, currentPassword: string): Promise<boolean> {
+  public checkPassword(
+    incomingPassword: string,
+    currentPassword: string,
+  ): Promise<boolean> {
     return compare(incomingPassword, currentPassword);
   }
 
   public async checkIsLoginUnique(login: string): Promise<boolean> {
-    return !await this.userModel.findOne({ login });
+    return !(await this.userModel.findOne({ login }));
   }
 
   public async checkIsEmailUnique(email: string): Promise<boolean> {
-    return !await this.userModel.findOne({ email });
+    return !(await this.userModel.findOne({ email }));
   }
 }

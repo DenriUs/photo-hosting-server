@@ -4,7 +4,9 @@ import { BlobServiceClient } from '@azure/storage-blob';
 @Injectable()
 export default class AzureStorageService {
   private getBlobServiceClient(): BlobServiceClient {
-    return BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+    return BlobServiceClient.fromConnectionString(
+      process.env.AZURE_STORAGE_CONNECTION_STRING,
+    );
   }
 
   public async tryCreateContainer(containerName: string): Promise<boolean> {
@@ -23,14 +25,12 @@ export default class AzureStorageService {
     const blobClientService = this.getBlobServiceClient();
     const containerClient = blobClientService.getContainerClient(containerName);
     const blobClient = containerClient.getBlockBlobClient(file.originalname);
-    try{
+    try {
       const response = await blobClient.uploadData(file.buffer);
       if (response.errorCode) return false;
       return true;
     } catch {
       return false;
     }
-    
   }
-
 }
