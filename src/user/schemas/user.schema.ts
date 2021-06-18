@@ -14,6 +14,9 @@ export class User {
 
   @Prop()
   email: string;
+
+  @Prop()
+  azureStorageContainerName: string;
 }
 
 export type UserDocument = User & Document;

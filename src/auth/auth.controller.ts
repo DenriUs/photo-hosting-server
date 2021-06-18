@@ -1,15 +1,17 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Post } from '@nestjs/common';
 import AuthService from './auth.service';
 import UserService from '../user/user.service';
 import CreateUserDto from '../user/dto/create-user.dto';
 import AuthorizeUserDto from '../user/dto/authorize-user.dto';
 import { ForAuthorized } from './auth.decorators';
+import AzureStorageService from 'src/azureStorage/azureStorage.service';
 
 @Controller('auth')
 export default class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly azureStorageService: AzureStorageService,
   ) {}
 
   @Post('login')
@@ -27,6 +29,12 @@ export default class AuthController {
   @Post('register')
   public async register(@Body() user: CreateUserDto): Promise<void> {
     await this.verifyRegistrationData(user);
+    const uuid = await this.userService.getUniqueUuidByParameter('azureStorageName');
+    const isContainerCreated = await this.azureStorageService.tryCreateContainer(uuid);
+    if (!isContainerCreated) {
+      throw new InternalServerErrorException();
+    }
+    user.azureStorageContainerName = uuid;
     await this.authService.register(user);
   }
 

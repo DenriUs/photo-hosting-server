@@ -12,12 +12,19 @@ export default class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
+  public async getUniqueUuidByParameter(parameter: 'userId' | 'azureStorageName') {
+    let uuid = '';
+    while (true) {
+      uuid = uuidV4();
+      const getAction = parameter === 'userId' ? this.getById : this.getByAzureStorageContainerName;
+      if (!await getAction(uuid)) break;
+    }
+    return uuid;
+  }
+
   public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(createUserDto);
-    while (true) {
-      createdUser._id = uuidV4();
-      if (!await this.getById(createdUser._id)) break;
-    }
+    createdUser._id = await this.getUniqueUuidByParameter('userId');
     return createdUser.save();
   }
 
@@ -27,6 +34,10 @@ export default class UserService {
 
   public getById(id: string): Promise<UserDocument> {
     return this.userModel.findOne({ _id: id }).exec();
+  }
+
+  public getByAzureStorageContainerName(name: string): Promise<UserDocument> {
+    return this.userModel.findOne({ azureStorageContainerName: name }).exec();
   }
 
   public getByLogin(login: string): Promise<UserDocument> {

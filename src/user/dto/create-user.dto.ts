@@ -6,4 +6,5 @@ export default class CreateUserDto {
   @IsEmail({}, { message: 'Введіть коректний email' })
   readonly email: string;
   password: string;
+  azureStorageContainerName?: string;
 }

@@ -2,9 +2,9 @@ import { config } from 'dotenv';
 
 config();
 
-const { PORT, JWT_SECRET, DB_CONNECTION_STRING } = process.env;
+const { PORT, JWT_SECRET, DB_CONNECTION_STRING, AZURE_STORAGE_CONNECTION_STRING } = process.env;
 
-if (!PORT || !JWT_SECRET || !DB_CONNECTION_STRING) {
+if (!PORT || !JWT_SECRET || !DB_CONNECTION_STRING || !AZURE_STORAGE_CONNECTION_STRING) {
   throw new Error('Not all .env variables are configured');
 }
 
