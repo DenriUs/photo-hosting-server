@@ -16,7 +16,7 @@ export class Photo {
   @Prop()
   creationLongitude?: string;
 
-  @Prop({ type: String, ref: User.name })
+  @Prop({ type: String, ref: 'User' })
   authorId: User;
 }
 
