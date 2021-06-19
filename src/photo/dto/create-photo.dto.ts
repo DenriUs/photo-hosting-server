@@ -1,7 +1,8 @@
+import { ExifInfo } from '../../exif/types';
+
 export default class CreatePhotoDto {
-  hostUrl: string;
-  creationTimestamp: number;
-  creationLatitude?: string;
-  creationLongitude?: string;
   authorId: string;
+  hostUrl: string;
+  originalName: string;
+  exif?: ExifInfo;
 }

@@ -5,16 +5,40 @@ import { User } from 'src/user/schemas/user.schema';
 @Schema()
 export class Photo {
   @Prop()
+  originalName: string;
+
+  @Prop()
   hostUrl: string;
 
   @Prop()
-  creationTimestamp: number;
+  creationDate: string;
 
   @Prop()
-  creationLatitude?: string;
+  width: number;
 
   @Prop()
-  creationLongitude?: string;
+  height: number;
+
+  @Prop()
+  latitude: number;
+
+  @Prop()
+  longitude: number;
+
+  @Prop()
+  cameraModel: string;
+  
+  @Prop()
+  apertureValue: number;
+
+  @Prop()
+  exposureTime: number;
+
+  @Prop()
+  focalLenght: number;
+  
+  @Prop()
+  iso: number;
 
   @Prop({ type: String, ref: 'User' })
   authorId: User;

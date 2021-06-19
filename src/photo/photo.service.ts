@@ -11,8 +11,13 @@ export class PhotoService {
   ) {}
 
   public async create(createPhotoDto: CreatePhotoDto): Promise<PhotoDocument> {
-    const newPhoto = new this.photoModel(createPhotoDto);
-    return newPhoto.save();
+    const newPhoto = new this.photoModel({
+      authorId: createPhotoDto.authorId,
+      originalName: createPhotoDto.originalName,
+      hostUrl: createPhotoDto.hostUrl,
+      ...createPhotoDto.exif,
+    });
+    return await newPhoto.save();
   }
 
   public async getAllByUserId(id: string): Promise<PhotoDocument[]> {

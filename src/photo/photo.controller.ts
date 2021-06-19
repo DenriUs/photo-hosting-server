@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   InternalServerErrorException,
@@ -8,11 +9,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PhotoService } from './photo.service';
-import AzureStorageService from '../azureStorage/azureStorage.service';
-import { ForAuthorized, GetUser } from 'src/auth/auth.decorators';
+import { ForAuthorized, GetUser } from '../auth/auth.decorators';
+import { PhotoDocument } from './shemas/photo.schema';
+import { ExifDto } from './dto/exif.dto';
 import CreatePhotoDto from './dto/create-photo.dto';
-import { UserDocument } from 'src/user/schemas/user.schema';
-import { Photo, PhotoDocument } from './shemas/photo.schema';
+import { UserDocument } from '../user/schemas/user.schema';
+import AzureStorageService from '../azure-storage/azure-storage.service';
 
 @ForAuthorized()
 @Controller('photo')
@@ -23,14 +25,15 @@ export class PhotoController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('photo'))
   async upload(
     @GetUser() currentUser: UserDocument,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<Photo> {
+    @UploadedFile() photo: Express.Multer.File,
+    @Body() exifData: ExifDto,
+  ): Promise<PhotoDocument> {
     const azureStorageContainerName = currentUser.azureStorageContainerName;
     const isUploaded = await this.azureStorageService.tryUploadFile(
-      file,
+      photo,
       azureStorageContainerName,
     );
     if (!isUploaded) {
@@ -38,9 +41,18 @@ export class PhotoController {
     }
     const newPhoto = new CreatePhotoDto();
     newPhoto.authorId = currentUser.id;
-    newPhoto.creationTimestamp = Date.now();
-    const fileContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${azureStorageContainerName}`;
-    newPhoto.hostUrl = `${fileContainer}/${file.originalname}`;
+    const PhotoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${azureStorageContainerName}`;
+    newPhoto.hostUrl = `${PhotoContainer}/${photo.originalname}`;
+    const parsedExifData = JSON.parse(JSON.stringify(exifData));
+    for (const exifField of Object.keys(parsedExifData)) {
+      if (parsedExifData[exifField] === 'undefined') {
+        parsedExifData[exifField] = null;
+      }
+    }
+    newPhoto.exif = parsedExifData;
+    if (!newPhoto.exif) {
+      newPhoto.exif.creationDate = new Date().toISOString();
+    }
     return await this.photoService.create(newPhoto);
   }
 

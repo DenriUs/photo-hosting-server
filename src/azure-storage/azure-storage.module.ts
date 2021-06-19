@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import AzureStorageService from './azureStorage.service';
+import AzureStorageService from './azure-storage.service';
 
 @Module({
   providers: [AzureStorageService],

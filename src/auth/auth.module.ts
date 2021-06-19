@@ -6,7 +6,7 @@ import JwtStrategy from './jwt.strategy';
 import AuthService from './auth.service';
 import UserModule from '../user/user.module';
 import envConfig from '../config/environment';
-import AzureStorageModule from 'src/azureStorage/azureStorage.module';
+import AzureStorageModule from '../azure-storage/azure-storage.module';
 
 @Module({
   imports: [

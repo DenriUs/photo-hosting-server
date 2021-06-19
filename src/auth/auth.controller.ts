@@ -3,8 +3,8 @@ import AuthService from './auth.service';
 import UserService from '../user/user.service';
 import CreateUserDto from '../user/dto/create-user.dto';
 import AuthorizeUserDto from '../user/dto/authorize-user.dto';
+import AzureStorageService from '../azure-storage/azure-storage.service';
 import { ForAuthorized } from './auth.decorators';
-import AzureStorageService from 'src/azureStorage/azureStorage.service';
 
 @Controller('auth')
 export default class AuthController {
