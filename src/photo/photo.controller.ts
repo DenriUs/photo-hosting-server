@@ -4,6 +4,7 @@ import {
   Get,
   InternalServerErrorException,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { ExifDto } from './dto/exif.dto';
 import CreatePhotoDto from './dto/create-photo.dto';
 import { UserDocument } from '../user/schemas/user.schema';
 import AzureStorageService from '../azure-storage/azure-storage.service';
+import UpdatePhotoDto from './dto/update-photo.dto';
 
 @ForAuthorized()
 @Controller('photo')
@@ -41,6 +43,7 @@ export class PhotoController {
     }
     const newPhoto = new CreatePhotoDto();
     newPhoto.authorId = currentUser.id;
+    newPhoto.originalName = photo.originalname;
     const PhotoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${azureStorageContainerName}`;
     newPhoto.hostUrl = `${PhotoContainer}/${photo.originalname}`;
     const parsedExifData = JSON.parse(JSON.stringify(exifData));
@@ -59,5 +62,10 @@ export class PhotoController {
   @Get('getOwnPhotos')
   async getOwnPhotos(@GetUser() currentUser: UserDocument): Promise<PhotoDocument[]> {
     return await this.photoService.getAllByUserId(currentUser.id);
+  }
+
+  @Post('update')
+  async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
+    return await this.photoService.update(updatePhotoDto);
   }
 }
