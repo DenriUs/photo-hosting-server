@@ -5,7 +5,8 @@ import { v4 as uuidV4 } from 'uuid';
 import { User, UserDocument } from './schemas/user.schema';
 import CreateUserDto from './dto/create-user.dto';
 import { compare } from 'bcrypt';
-import AddFavoriteDto from '../photo/dto/add-favorite.dto';
+import FavoriteDto from '../photo/dto/favorite.dto';
+import { Photo, PhotoDocument } from 'src/photo/shemas/photo.schema';
 
 @Injectable()
 export default class UserService {
@@ -53,12 +54,25 @@ export default class UserService {
     return this.userModel.findOne({ login }).exec();
   }
 
+  public async getAllFavoriteByUserId(id: string): Promise<Photo[]> {
+    return (await this.userModel.findOne({ _id: id }).populate('favoritePhotoIds').exec()).favoritePhotoIds;
+  }
+
   public async addFavorite(
-    addFavorite: AddFavoriteDto,
+    addFavorite: FavoriteDto,
   ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(
       { _id: addFavorite.userId },
-      { $addToSet: { favoritePhotos: [addFavorite.favoritePhotoId] } },
+      { $addToSet: { favoritePhotoIds: [addFavorite.favoritePhotoId] } },
+    );
+  }
+
+  public async removeFavorite(
+    addFavorite: FavoriteDto,
+  ): Promise<UserDocument> {
+    return this.userModel.findOneAndUpdate(
+      { _id: addFavorite.userId },
+      { $pull: { favoritePhotoIds: addFavorite.favoritePhotoId } },
     );
   }
 

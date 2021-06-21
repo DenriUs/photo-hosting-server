@@ -23,13 +23,21 @@ export class PhotoService {
 
   public async getById(id: string): Promise<PhotoDocument> {
     return this.photoModel.findById(id);
-  } 
+  }
 
-  public async getAllByUserId(id: string): Promise<PhotoDocument[]> {
-    return this.photoModel.find().where('authorId').equals(id).exec();
+  public async getAllOwnByUserId(id: string): Promise<PhotoDocument[]> {
+    return this.photoModel
+      .find()
+      .where('authorId')
+      .equals(id)
+      .exec();
   }
 
   public async update(updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
-    return this.photoModel.findOneAndUpdate({ _id: updatePhotoDto.id }, { ...updatePhotoDto });
+    return this.photoModel.findOneAndUpdate(
+      { _id: updatePhotoDto.id },
+      { ...updatePhotoDto },
+      { new: true },
+    );
   }
 }

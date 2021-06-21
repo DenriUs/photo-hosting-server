@@ -17,7 +17,7 @@ import { UserDocument } from '../user/schemas/user.schema';
 import AzureStorageService from '../azure-storage/azure-storage.service';
 import UpdatePhotoDto from './dto/update-photo.dto';
 import UserService from 'src/user/user.service';
-import AddFavoriteDto from 'src/photo/dto/add-favorite.dto';
+import FavoriteDto from './dto/favorite.dto';
 
 @ForAuthorized()
 @Controller('photo')
@@ -62,18 +62,29 @@ export class PhotoController {
   }
 
   @Post('addFavorite')
-  async addFavorites(@Body() addFavoriteDto: AddFavoriteDto): Promise<Photo> {
+  async addFavorite(@Body() addFavoriteDto: FavoriteDto): Promise<Photo> {
     await this.userService.addFavorite(addFavoriteDto);
     return await this.photoService.getById(addFavoriteDto.favoritePhotoId);
   }
 
+  @Post('removeFavorite')
+  async removeFavorite(@Body() removeFavoriteDto: FavoriteDto): Promise<string> {
+    await this.userService.removeFavorite(removeFavoriteDto);
+    return removeFavoriteDto.favoritePhotoId
+  }
+
   @Get('getOwnPhotos')
   async getOwnPhotos(@GetUser() currentUser: UserDocument): Promise<PhotoDocument[]> {
-    return await this.photoService.getAllByUserId(currentUser.id);
+    return await this.photoService.getAllOwnByUserId(currentUser.id);
+  }
+
+  @Get('getFavoritePhotos')
+  async getFavoritePhotos(@GetUser() currentUser: UserDocument): Promise<Photo[]> {
+    return await this.userService.getAllFavoriteByUserId(currentUser.id);
   }
 
   @Post('update')
-  async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<void> {
-    await this.photoService.update(updatePhotoDto);
+  async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
+    return await this.photoService.update(updatePhotoDto);
   }
 }
