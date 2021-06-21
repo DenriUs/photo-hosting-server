@@ -4,25 +4,27 @@ import {
   Get,
   InternalServerErrorException,
   Post,
-  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PhotoService } from './photo.service';
 import { ForAuthorized, GetUser } from '../auth/auth.decorators';
-import { PhotoDocument } from './shemas/photo.schema';
+import { Photo, PhotoDocument } from './shemas/photo.schema';
 import { ExifDto } from './dto/exif.dto';
 import CreatePhotoDto from './dto/create-photo.dto';
 import { UserDocument } from '../user/schemas/user.schema';
 import AzureStorageService from '../azure-storage/azure-storage.service';
 import UpdatePhotoDto from './dto/update-photo.dto';
+import UserService from 'src/user/user.service';
+import AddFavoriteDto from 'src/photo/dto/add-favorite.dto';
 
 @ForAuthorized()
 @Controller('photo')
 export class PhotoController {
   constructor(
     private readonly photoService: PhotoService,
+    private readonly userService: UserService,
     private readonly azureStorageService: AzureStorageService,
   ) {}
 
@@ -59,13 +61,19 @@ export class PhotoController {
     return await this.photoService.create(newPhoto);
   }
 
+  @Post('addFavorite')
+  async addFavorites(@Body() addFavoriteDto: AddFavoriteDto): Promise<Photo> {
+    await this.userService.addFavorite(addFavoriteDto);
+    return await this.photoService.getById(addFavoriteDto.favoritePhotoId);
+  }
+
   @Get('getOwnPhotos')
   async getOwnPhotos(@GetUser() currentUser: UserDocument): Promise<PhotoDocument[]> {
     return await this.photoService.getAllByUserId(currentUser.id);
   }
 
   @Post('update')
-  async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
-    return await this.photoService.update(updatePhotoDto);
+  async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<void> {
+    await this.photoService.update(updatePhotoDto);
   }
 }

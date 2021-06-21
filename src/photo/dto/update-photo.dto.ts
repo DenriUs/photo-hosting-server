@@ -1,5 +1,5 @@
 export default class UpdatePhotoDto {
-  id: string;
+  readonly id: string;
   latitude: number;
   longitude: number;
 }

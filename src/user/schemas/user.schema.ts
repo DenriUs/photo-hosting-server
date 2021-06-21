@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { Photo } from 'src/photo/shemas/photo.schema';
 
 @Schema()
 export class User {
@@ -17,6 +18,12 @@ export class User {
 
   @Prop()
   azureStorageContainerName: string;
+
+  @Prop([{ type: String, ref: 'Photo' }])
+  favoritePhotos: Photo[];
+
+  @Prop([{ type: String, ref: 'Photo' }])
+  availablePhotos: Photo[];
 }
 
 export type UserDocument = User & Document;

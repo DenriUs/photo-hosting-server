@@ -21,6 +21,10 @@ export class PhotoService {
     return await newPhoto.save();
   }
 
+  public async getById(id: string): Promise<PhotoDocument> {
+    return this.photoModel.findById(id);
+  } 
+
   public async getAllByUserId(id: string): Promise<PhotoDocument[]> {
     return this.photoModel.find().where('authorId').equals(id).exec();
   }

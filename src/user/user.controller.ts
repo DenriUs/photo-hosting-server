@@ -12,7 +12,7 @@ export default class UserController {
   public async getCurrentUserData(
     @GetUser() currentUser: UserDocument,
   ): Promise<Partial<UserDocument>> {
-    const { id, login, email } = currentUser;
-    return { id, login, email };
+    const { id, login, email, favoritePhotos } = currentUser;
+    return { id, login, email, favoritePhotos };
   }
 }

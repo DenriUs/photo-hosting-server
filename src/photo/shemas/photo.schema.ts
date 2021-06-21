@@ -5,6 +5,9 @@ import { User } from 'src/user/schemas/user.schema';
 @Schema()
 export class Photo {
   @Prop()
+  id: string;
+
+  @Prop()
   originalName: string;
 
   @Prop()

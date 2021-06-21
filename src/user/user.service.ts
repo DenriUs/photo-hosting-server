@@ -5,6 +5,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { User, UserDocument } from './schemas/user.schema';
 import CreateUserDto from './dto/create-user.dto';
 import { compare } from 'bcrypt';
+import AddFavoriteDto from '../photo/dto/add-favorite.dto';
 
 @Injectable()
 export default class UserService {
@@ -50,6 +51,15 @@ export default class UserService {
 
   public getByLogin(login: string): Promise<UserDocument | undefined> {
     return this.userModel.findOne({ login }).exec();
+  }
+
+  public async addFavorite(
+    addFavorite: AddFavoriteDto,
+  ): Promise<UserDocument> {
+    return this.userModel.findOneAndUpdate(
+      { _id: addFavorite.userId },
+      { $addToSet: { favoritePhotos: [addFavorite.favoritePhotoId] } },
+    );
   }
 
   public checkPassword(
