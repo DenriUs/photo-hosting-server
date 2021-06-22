@@ -19,11 +19,17 @@ export class User {
   @Prop()
   azureStorageContainerName: string;
 
+  @Prop({ type: String, ref: 'Photo' })
+  profilePhoto: Photo;
+
+  @Prop({ type: String, ref: 'Photo' })
+  backgroundPhoto: Photo;
+
   @Prop([{ type: String, ref: 'Photo' }])
   favoritePhotoIds: Photo[];
 
   @Prop([{ type: String, ref: 'Photo' }])
-  availablePhotoIds: Photo[];
+  accessedPhotoIds: Photo[];
 }
 
 export type UserDocument = User & Document;

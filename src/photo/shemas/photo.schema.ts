@@ -43,6 +43,12 @@ export class Photo {
   @Prop()
   iso: number;
 
+  @Prop()
+  isShared: boolean;
+
+  @Prop()
+  authorLogin: string;
+
   @Prop({ type: String, ref: 'User' })
   authorId: User;
 }

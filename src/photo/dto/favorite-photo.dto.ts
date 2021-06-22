@@ -1,4 +1,4 @@
-export default class FavoriteDto {
+export default class FavoritePhotoDto {
   readonly userId: string;
   readonly favoritePhotoId: string;
 }

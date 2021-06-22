@@ -14,6 +14,7 @@ export class PhotoService {
   public async create(createPhotoDto: CreatePhotoDto): Promise<PhotoDocument> {
     const newPhoto = new this.photoModel({
       authorId: createPhotoDto.authorId,
+      authorLogin: createPhotoDto.authorLogin,
       originalName: createPhotoDto.originalName,
       hostUrl: createPhotoDto.hostUrl,
       ...createPhotoDto.exif,
@@ -31,6 +32,13 @@ export class PhotoService {
       .where('authorId')
       .equals(id)
       .exec();
+  }
+
+  public async makeShared(id: string): Promise<PhotoDocument> {
+    return this.photoModel.findOneAndUpdate(
+      { _id: id },
+      { isShared: true },
+    )
   }
 
   public async update(updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
