@@ -56,8 +56,16 @@ export default class UserService {
     return this.userModel.findOne({ login }).exec();
   }
 
-  public getAllByLoginPart(loginPart: string): Promise<UserDocument[] | undefined> {
-    return this.userModel.find({ 'login': { '$regex': loginPart, '$options': 'i' } }).exec();
+  public getByEmail(email: string): Promise<UserDocument | undefined> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  public getAllByLoginPart(
+    loginPart: string,
+  ): Promise<UserDocument[] | undefined> {
+    return this.userModel
+      .find({ login: { $regex: loginPart, $options: 'i' } })
+      .exec();
   }
 
   public async getAllFavoriteByUserId(id: string): Promise<Photo[]> {
@@ -78,31 +86,31 @@ export default class UserService {
     ).accessedPhotoIds;
   }
 
-  public async update(updateUserDto: UpdateUserDto): Promise<UserDocument> {
-    return this.userModel.findOneAndUpdate(
-      { _id: updateUserDto.id },
-      {
-        profilePhoto: updateUserDto.profilePhoto,
-        backgroundPhoto: updateUserDto.profilePhoto,
-      },
-    );
+  public async update(user: UserDocument): Promise<UserDocument> {
+    return this.userModel.findOneAndUpdate({ _id: user.id }, user);
   }
 
-  public async addFavorite(addFavorite: FavoritePhotoDto): Promise<UserDocument> {
+  public async addFavorite(
+    addFavorite: FavoritePhotoDto,
+  ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(
       { _id: addFavorite.userId },
       { $addToSet: { favoritePhotoIds: [addFavorite.favoritePhotoId] } },
     );
   }
 
-  public async addAccessed(addAccessed: AccessedPhotoDto): Promise<UserDocument> {
+  public async addAccessed(
+    addAccessed: AccessedPhotoDto,
+  ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(
       { _id: addAccessed.userId },
       { $addToSet: { accessedPhotoIds: [addAccessed.accessedPhotoId] } },
     );
   }
 
-  public async removeFavorite(addFavorite: FavoritePhotoDto): Promise<UserDocument> {
+  public async removeFavorite(
+    addFavorite: FavoritePhotoDto,
+  ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(
       { _id: addFavorite.userId },
       { $pull: { favoritePhotoIds: addFavorite.favoritePhotoId } },

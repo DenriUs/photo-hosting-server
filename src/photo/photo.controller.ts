@@ -8,7 +8,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PhotoService } from './photo.service';
+import PhotoService from './photo.service';
 import { ForAuthorized, GetUser } from '../auth/auth.decorators';
 import { Photo, PhotoDocument } from './shemas/photo.schema';
 import { ExifDto } from './dto/exif.dto';
@@ -22,7 +22,7 @@ import AccessedPhotoDto from './dto/accessed-photo.dto';
 
 @ForAuthorized()
 @Controller('photo')
-export class PhotoController {
+export default class PhotoController {
   constructor(
     private readonly photoService: PhotoService,
     private readonly userService: UserService,
@@ -70,7 +70,9 @@ export class PhotoController {
   }
 
   @Post('addAccessed')
-  async addAccessed(@Body() addAccessedDto: AccessedPhotoDto): Promise<PhotoDocument> {
+  async addAccessed(
+    @Body() addAccessedDto: AccessedPhotoDto,
+  ): Promise<PhotoDocument> {
     console.log(addAccessedDto);
     await this.userService.addAccessed(addAccessedDto);
     return await this.photoService.makeShared(addAccessedDto.accessedPhotoId);

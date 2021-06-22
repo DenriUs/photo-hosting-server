@@ -6,7 +6,7 @@ import UpdatePhotoDto from './dto/update-photo.dto';
 import { Photo, PhotoDocument } from './shemas/photo.schema';
 
 @Injectable()
-export class PhotoService {
+export default class PhotoService {
   constructor(
     @InjectModel(Photo.name) private readonly photoModel: Model<PhotoDocument>,
   ) {}
@@ -35,10 +35,7 @@ export class PhotoService {
   }
 
   public async makeShared(id: string): Promise<PhotoDocument> {
-    return this.photoModel.findOneAndUpdate(
-      { _id: id },
-      { isShared: true },
-    )
+    return this.photoModel.findOneAndUpdate({ _id: id }, { isShared: true });
   }
 
   public async update(updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {

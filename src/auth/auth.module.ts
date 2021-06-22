@@ -7,11 +7,13 @@ import AuthService from './auth.service';
 import UserModule from '../user/user.module';
 import envConfig from '../config/environment';
 import AzureStorageModule from '../azure-storage/azure-storage.module';
+import EmailModule from 'src/email/email.module';
 
 @Module({
   imports: [
     UserModule,
     AzureStorageModule,
+    EmailModule,
     PassportModule,
     JwtModule.register({
       secret: envConfig.jwtSecret || 'SECRET',

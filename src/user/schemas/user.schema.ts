@@ -19,6 +19,12 @@ export class User {
   @Prop()
   azureStorageContainerName: string;
 
+  @Prop()
+  resetCode: string;
+
+  @Prop()
+  resetCodeLastCreationTime: number;
+
   @Prop({ type: String, ref: 'Photo' })
   profilePhoto: Photo;
 
