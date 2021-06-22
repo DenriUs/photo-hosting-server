@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
+import { User } from '../../user/schemas/user.schema';
+import { Comment } from '../../comment/shemas/comment.schema'
 
 @Schema()
 export class Photo {
@@ -51,6 +52,9 @@ export class Photo {
 
   @Prop({ type: String, ref: 'User' })
   authorId: User;
+
+  @Prop([{ type: String, ref: 'Comment' }])
+  commentIds: Comment;
 }
 
 export type PhotoDocument = Photo & Document;
