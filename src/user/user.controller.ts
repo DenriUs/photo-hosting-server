@@ -12,9 +12,8 @@ export default class UserController {
   @Get('getCurrentUserData')
   public async getCurrentUserData(
     @GetUser() currentUser: UserDocument,
-  ): Promise<Partial<UserDocument>> {
-    const { id, login, email, favoritePhotoIds } = currentUser;
-    return { id, login, email, favoritePhotoIds };
+  ): Promise<UserDocument> {
+    return await this.userService.getCurrentUserById(currentUser.id);
   }
 
   @Get('searchToSharePhoto/:photoId/:loginPart')

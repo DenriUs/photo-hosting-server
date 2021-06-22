@@ -25,11 +25,11 @@ export class User {
   @Prop()
   resetCodeLastCreationTime: number;
 
-  @Prop({ type: String, ref: 'Photo' })
-  profilePhoto: Photo;
+  @Prop()
+  profilePhotoUrl: string;
 
-  @Prop({ type: String, ref: 'Photo' })
-  backgroundPhoto: Photo;
+  @Prop()
+  backgroundPhotoUrl: string;
 
   @Prop([{ type: String, ref: 'Photo' }])
   favoritePhotoIds: Photo[];

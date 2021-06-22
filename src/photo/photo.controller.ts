@@ -12,7 +12,6 @@ import PhotoService from './photo.service';
 import { ForAuthorized, GetUser } from '../auth/auth.decorators';
 import { Photo, PhotoDocument } from './shemas/photo.schema';
 import { ExifDto } from './dto/exif.dto';
-import CreatePhotoDto from './dto/create-photo.dto';
 import { UserDocument } from '../user/schemas/user.schema';
 import AzureStorageService from '../azure-storage/azure-storage.service';
 import UpdatePhotoDto from './dto/update-photo.dto';
@@ -37,30 +36,41 @@ export default class PhotoController {
     @Body() exifData: ExifDto,
   ): Promise<PhotoDocument> {
     const azureStorageContainerName = currentUser.azureStorageContainerName;
-    const isUploaded = await this.azureStorageService.tryUploadFile(
+    await this.uploadPhotoToAzure(azureStorageContainerName, photo);
+    const photoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${currentUser.azureStorageContainerName}`;
+    const newPhoto = this.photoService.preparePhotoToSave(
+      currentUser,
       photo,
-      azureStorageContainerName,
+      photoContainer,
+      exifData,
     );
-    if (!isUploaded) {
-      throw new InternalServerErrorException();
-    }
-    const newPhoto = new CreatePhotoDto();
-    newPhoto.authorId = currentUser.id;
-    newPhoto.authorLogin = currentUser.login;
-    newPhoto.originalName = photo.originalname;
-    const photoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${azureStorageContainerName}`;
-    newPhoto.hostUrl = `${photoContainer}/${photo.originalname}`;
-    const parsedExifData = JSON.parse(JSON.stringify(exifData));
-    for (const exifField of Object.keys(parsedExifData)) {
-      if (parsedExifData[exifField] === 'undefined') {
-        parsedExifData[exifField] = null;
-      }
-    }
-    newPhoto.exif = parsedExifData;
-    if (!newPhoto.exif) {
-      newPhoto.exif.creationDate = new Date().toISOString();
-    }
     return await this.photoService.create(newPhoto);
+  }
+
+  @Post('updateProfilePhoto')
+  @UseInterceptors(FileInterceptor('photo'))
+  async uploadProfilePhoto(
+    @GetUser() currentUser: UserDocument,
+    @UploadedFile() photo: Express.Multer.File,
+  ): Promise<UserDocument> {
+    const azureStorageContainerName = currentUser.azureStorageContainerName;
+    await this.uploadPhotoToAzure(azureStorageContainerName, photo);
+    const photoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${currentUser.azureStorageContainerName}`;
+    currentUser.profilePhotoUrl = `${photoContainer}/${photo.originalname}`;
+    return await this.userService.update(currentUser);
+  }
+
+  @Post('updateBackgroundPhoto')
+  @UseInterceptors(FileInterceptor('photo'))
+  async updateBackgroundPhoto(
+    @GetUser() currentUser: UserDocument,
+    @UploadedFile() photo: Express.Multer.File,
+  ): Promise<UserDocument> {
+    const azureStorageContainerName = currentUser.azureStorageContainerName;
+    await this.uploadPhotoToAzure(azureStorageContainerName, photo);
+    const photoContainer = `${process.env.AZURE_STORAGE_ACCOUNT_URL}/${currentUser.azureStorageContainerName}`;
+    currentUser.backgroundPhotoUrl = `${photoContainer}/${photo.originalname}`;
+    return await this.userService.update(currentUser);
   }
 
   @Post('addFavorite')
@@ -73,7 +83,6 @@ export default class PhotoController {
   async addAccessed(
     @Body() addAccessedDto: AccessedPhotoDto,
   ): Promise<PhotoDocument> {
-    console.log(addAccessedDto);
     await this.userService.addAccessed(addAccessedDto);
     return await this.photoService.makeShared(addAccessedDto.accessedPhotoId);
   }
@@ -110,5 +119,18 @@ export default class PhotoController {
   @Post('update')
   async update(@Body() updatePhotoDto: UpdatePhotoDto): Promise<PhotoDocument> {
     return await this.photoService.update(updatePhotoDto);
+  }
+
+  private async uploadPhotoToAzure(
+    azureStorageContainerName: string,
+    photo: Express.Multer.File,
+  ) {
+    const isUploaded = await this.azureStorageService.tryUploadFile(
+      photo,
+      azureStorageContainerName,
+    );
+    if (!isUploaded) {
+      throw new InternalServerErrorException();
+    }
   }
 }

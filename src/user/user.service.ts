@@ -7,7 +7,6 @@ import CreateUserDto from './dto/create-user.dto';
 import { compare } from 'bcrypt';
 import FavoritePhotoDto from '../photo/dto/favorite-photo.dto';
 import { Photo } from 'src/photo/shemas/photo.schema';
-import UpdateUserDto from './dto/update-user.dto';
 import AccessedPhotoDto from 'src/photo/dto/accessed-photo.dto';
 
 @Injectable()
@@ -43,6 +42,10 @@ export default class UserService {
   }
 
   public getById(id: string): Promise<UserDocument | undefined> {
+    return this.userModel.findOne({ _id: id }).exec();
+  }
+
+  public getCurrentUserById(id: string): Promise<UserDocument | undefined> {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
@@ -87,7 +90,7 @@ export default class UserService {
   }
 
   public async update(user: UserDocument): Promise<UserDocument> {
-    return this.userModel.findOneAndUpdate({ _id: user.id }, user);
+    return this.userModel.findOneAndUpdate({ _id: user.id }, user, { new: true });
   }
 
   public async addFavorite(
