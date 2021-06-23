@@ -27,8 +27,7 @@ export default class EmailService {
       from: process.env.SERVICE_EMAIL,
       to: receiver,
       subject,
-      text: message,
-      //html: this.getHtmlNotification(username, message),
+      html: this.getHtmlNotification(username, message),
     });
   }
 

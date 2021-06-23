@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import AuthModule from '../auth/auth.module';
 import UserModule from '../user/user.module';
 import envConfig from '../config/environment';
@@ -10,6 +12,9 @@ import CommentModule from 'src/comment/comment.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../shared'),
+    }),
     MongooseModule.forRoot(envConfig.dbConnectionString),
     AuthModule,
     UserModule,
